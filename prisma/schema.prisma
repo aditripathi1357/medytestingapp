@@ -70,29 +70,6 @@ model User {
   injuries        String[] @default([])
   surgeries       String[] @default([])
 
-  // Addresses
-  addresses Address[] // Relation to Address model
+ 
 }
 
-model Address {
-  id          String    @id @default(uuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  type        String    // e.g., "Home", "Work", "Other"
-  houseNumber String?
-  street      String?
-  landmark    String?
-  area        String?
-  city        String
-  state       String
-  pincode     String
-  latitude    Float?
-  longitude   Float?
-  isDefault   Boolean   @default(false) // To mark a primary/active address
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@index([userId]) // Index for faster querying by userId
-}
