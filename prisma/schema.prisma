@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id             String   @id @default(uuid())
+  managementType String
+  submittedAt    DateTime @default(now())
+  // Personal Info
+  fullName    String
+  email       String
+  phone       String
+  designation String
+  // Clinic Info
+  clinicName         String
+  clinicType         String
+  registrationNumber String
+  establishmentYear  String
+  address            String
+  // Documents Info
+  departments       String
+  doctorsCount      String
+  communicationMode String
+  // File Paths
+  governmentIdPath                    String?
+  governmentIdOriginalName            String?
+  registrationCertificatePath         String?
+  registrationCertificateOriginalName String?
+  accreditationPath                   String?
+  accreditationOriginalName           String?
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  phone       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  supabaseUid String    @unique
+
+  // Demographic Data
+  title         String?
+  name          String?
+  birthDate     DateTime?
+  gender        String?
+  bloodGroup    String?
+  height        Int?
+  weight        Int?
+  maritalStatus String?
+  contactNumber String?   // Consider if this is primary contact or demographic specific
+  alternateNumber String?
+
+  // Lifestyle Data
+  smokingHabit       String?
+  alcoholConsumption String?
+  activityLevel      String?
+  dietHabit          String?
+  occupation         String?
+
+  // Medical Data
+  allergies       String[] @default([])
+  medications     String[] @default([])
+  chronicDiseases String[] @default([])
+  injuries        String[] @default([])
+  surgeries       String[] @default([])
+
+  // Addresses
+  addresses Address[] // Relation to Address model
+}
+
+model Address {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type        String    // e.g., "Home", "Work", "Other"
+  houseNumber String?
+  street      String?
+  landmark    String?
+  area        String?
+  city        String
+  state       String
+  pincode     String
+  latitude    Float?
+  longitude   Float?
+  isDefault   Boolean   @default(false) // To mark a primary/active address
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId]) // Index for faster querying by userId
+}
